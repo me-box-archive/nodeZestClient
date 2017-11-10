@@ -8,7 +8,7 @@ This is work inprogress to build a lib for [Databox](https://github.com/me-box/d
 ## Starting server
 
 ```bash
-$ docker run -p 5555:5555 -p 5556:5556 -d --name zest --rm jptmoore/zest /app/zest/server.exe --secret-key 'EKy(xjAnIfg6AT+OGd?nS1Mi5zZ&b*VXA@WxNLLE' --enable-logging
+$ docker run -p 5555:5555 -p 5556:5556 -d --name zest --rm jptmoore/zest /app/zest/server.exe --secret-key-file example-server-key --enable-logging
 $ docker logs zest -f
 ```
 
