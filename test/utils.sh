@@ -25,12 +25,12 @@ function test_contains {
 }
 
 function fail {
-    echo "[$(datef) $ME]: ${1} $(red FAILED) \n Expected: ${2} \n GOT: ${3}"
+    echo -e "[$(datef) $ME]: ${1} $(red FAILED) \n Expected: ${2} \n GOT: ${3}"
     exit 1
 }
 
 function success {
-    echo "[$(datef) $ME]: ${1} $(green OK)"
+    echo -e "[$(datef) $ME]: ${1} $(green OK)"
 }
 
 
