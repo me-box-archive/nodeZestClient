@@ -1,5 +1,7 @@
 # nodeZestClient
 
+[![Build Status](https://travis-ci.org/Toshbrown/nodeZestClient.svg?branch=master)](https://travis-ci.org/Toshbrown/nodeZestClient)
+
 A NodeJs Lib for [REST over ZeroMQ](https://github.com/jptmoore/zest)
 
 ## Starting server to test agents
