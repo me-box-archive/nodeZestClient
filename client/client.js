@@ -41,7 +41,7 @@ const argv = yargs
   },
   "enable-logging": {
     description: "output debug information",
-    default: true
+    default: false
   }
 })
 .argv;
