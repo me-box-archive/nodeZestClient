@@ -30,9 +30,10 @@ exports.New = function (endpoint, dealerEndpoint, serverKey, logging) {
             return new Promise((resolve,reject)=>{
 
                 let zh = NewZestHeader();
-                zh.code = 2
-                zh.token = token
-                zh.payload = payload
+                zh.code = 2;
+                zh.token = token;
+                zh.tkl = token.length;
+                zh.payload = payload;
                 zh.oc = 3;
                 zh.options.push(NewZestOptionHeader(11,path,path.length));
                 let hostname = os.hostname();
@@ -53,8 +54,9 @@ exports.New = function (endpoint, dealerEndpoint, serverKey, logging) {
         Get: function (token, path, contentFormat) {
             return new Promise((resolve,reject)=>{
                 let zh = NewZestHeader();
-                zh.code = 1
-                zh.token = token
+                zh.code = 1;
+                zh.token = token;
+                zh.tkl = token.length;
                 zh.oc = 3;
                 zh.options.push(NewZestOptionHeader(11,path,path.length));
                 let hostname = os.hostname();
@@ -76,7 +78,8 @@ exports.New = function (endpoint, dealerEndpoint, serverKey, logging) {
             return new Promise((resolve,reject)=>{
                 let zh = NewZestHeader();
                 zh.code = 1
-                zh.token = token
+                zh.token = token;
+                zh.tkl = token.length;
                 zh.oc = 5;
                 zh.options.push(NewZestOptionHeader(11,path,path.length));
                 let hostname = os.hostname();

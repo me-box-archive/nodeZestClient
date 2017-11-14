@@ -1,21 +1,21 @@
 {
   "name": "nodezestclient",
-  "version": "0.0.1",
-  "description": "A NodeJs Lib for REST over ZeroMQ",
-  "main": "index.js",
+  "version": "0.0.3",
+  "description": "A NodeJs Lib for Zest REST over ZeroMQ",
+  "main": "zest.js",
   "scripts": {
     "test": "test/test.sh"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/Toshbrown/nodeZestClient.git"
+    "url": "git+https://github.com/toshbrown/nodeZestClient.git"
   },
   "author": "toshbrown",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/Toshbrown/nodeZestClient/issues"
+    "url": "https://github.com/toshbrown/nodeZestClient/issues"
   },
-  "homepage": "https://github.com/Toshbrown/nodeZestClient#readme",
+  "homepage": "https://github.com/toshbrown/nodeZestClient#readme",
   "dependencies": {
     "hexer": "^1.5.0",
     "yargs": "^10.0.3",
