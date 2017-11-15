@@ -26,6 +26,8 @@ exports.New = function (endpoint, dealerEndpoint, serverKey, logging) {
 
         ZMQsoc: soc,
 
+        Observers: {}, //a dict to keep track of observers so they can be closed
+
         Post: function (token, path, payload, contentFormat) {
             return new Promise((resolve,reject)=>{
 
@@ -90,10 +92,9 @@ exports.New = function (endpoint, dealerEndpoint, serverKey, logging) {
                 log(zh);
                 msg = MarshalZestHeader(zh)
                 sendRequestAndAwaitResponse(this.ZMQsoc,msg)
-                .then((msg)=>{
+                .then(function (msg) {
 
                     let observe = function (zh) {
-                        console.log(zh);
 
                         let dealer = zmq.socket('dealer');
 
@@ -111,6 +112,9 @@ exports.New = function (endpoint, dealerEndpoint, serverKey, logging) {
                         dealer.curve_publickey = new Buffer.from(curveKeypair.public,'utf8');
                         dealer.curve_secretkey = new Buffer.from(curveKeypair.secret,'utf8');
                         dealer.connect(dealer_endpoint);
+
+                        console.log(this);
+                        this.client.Observers[path] = dealer;
 
                         let EE = new EventEmitter();
 
@@ -135,7 +139,7 @@ exports.New = function (endpoint, dealerEndpoint, serverKey, logging) {
                         });
 
                         resolve(EE);
-                    }
+                    };
 
                     handleResponse(msg,observe,reject);
 
@@ -144,8 +148,13 @@ exports.New = function (endpoint, dealerEndpoint, serverKey, logging) {
                     reject(err);
                 });
             });
+        },
+        StopObserving: function (path) {
+            if(this.Observers[path]) {
+                this.Observers[path].close();
+            }
         }
-    }
+    };
 
     return zestClient;
 }

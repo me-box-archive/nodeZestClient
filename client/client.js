@@ -77,8 +77,14 @@ case 'OBSERVE':
 client.Observe(argv["token"],argv["path"],argv["format"])
 .then((eventEmmiter)=>{
   console.log("Waiting for data:")
+  let dataCount = 0;
   eventEmmiter.on('data',(data)=>{
     console.log(data);
+    dataCount++;
+    if(dataCount > 3) {
+      client.StopObserving(argv["path"]);
+      client.ZMQsoc.close();
+    }
   })
   eventEmmiter.on('error',(data)=>{
     console.log(data);
