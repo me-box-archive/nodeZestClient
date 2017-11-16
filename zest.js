@@ -113,7 +113,6 @@ exports.New = function (endpoint, dealerEndpoint, serverKey, logging) {
                         dealer.curve_secretkey = new Buffer.from(curveKeypair.secret,'utf8');
                         dealer.connect(dealer_endpoint);
 
-                        console.log(this);
                         zestClient.Observers[path] = dealer;
 
                         let EE = new EventEmitter();
