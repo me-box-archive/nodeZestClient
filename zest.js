@@ -114,7 +114,7 @@ exports.New = function (endpoint, dealerEndpoint, serverKey, logging) {
                         dealer.connect(dealer_endpoint);
 
                         console.log(this);
-                        zestClient.Observerss[path] = dealer;
+                        zestClient.Observers[path] = dealer;
 
                         let EE = new EventEmitter();
 

@@ -1,6 +1,6 @@
 {
   "name": "nodezestclient",
-  "version": "0.0.5",
+  "version": "0.0.6",
   "description": "A NodeJs Lib for Zest REST over ZeroMQ",
   "main": "zest.js",
   "scripts": {
