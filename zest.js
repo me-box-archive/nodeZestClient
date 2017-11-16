@@ -114,7 +114,7 @@ exports.New = function (endpoint, dealerEndpoint, serverKey, logging) {
                         dealer.connect(dealer_endpoint);
 
                         console.log(this);
-                        this.client.Observers[path] = dealer;
+                        zestClient.Observerss[path] = dealer;
 
                         let EE = new EventEmitter();
 
@@ -150,8 +150,8 @@ exports.New = function (endpoint, dealerEndpoint, serverKey, logging) {
             });
         },
         StopObserving: function (path) {
-            if(this.Observers[path]) {
-                this.Observers[path].close();
+            if(zestClient.Observers[path]) {
+                zestClient.Observers[path].close();
             }
         }
     };
