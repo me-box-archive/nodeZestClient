@@ -76,7 +76,7 @@ exports.New = function (endpoint, dealerEndpoint, serverKey, logging) {
             });
         },
 
-        Observe: function (token, path, contentFormat, timeOut = 60) {
+        Observe: function (token, path, contentFormat, timeOut = 0) {
             return new Promise((resolve,reject)=>{
                 let zh = NewZestHeader();
                 zh.code = 1
