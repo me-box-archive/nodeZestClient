@@ -250,7 +250,7 @@ function MarshalZestHeader(zh) {
 
     let optionsLen = zh.options.reduce((len,option)=>{return {len:4 + len.len + option.len};});
 
-    let buf = Buffer.alloc(8+zh.tkl+optionsLen.len+zh.payload.length);
+    let buf = Buffer.alloc(8+zh.tkl+optionsLen.len+Buffer.byteLength(zh.payload,'utf8'));
 
     buf.writeUInt8(zh.code,0);
     buf.writeUInt8(zh.oc,1);
@@ -264,7 +264,7 @@ function MarshalZestHeader(zh) {
         offset += zoh.length;
     }
 
-    buf.write(zh.payload,offset,zh.payload.length,'utf8');
+    buf.write(zh.payload,offset,Buffer.byteLength(zh.payload,'utf8'),'utf8');
 
     return buf;
 

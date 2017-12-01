@@ -27,7 +27,7 @@ RES=$($CMD --method post --format binary --path /kv/test --payload "{\"name\":\"
 test_assert "$EXPECTED" "$RES" "Test KV POST BINARY "
 
 EXPECTED='{"name":"tosh","age":36}'
-RES=$($CMD --method get --format binary --path /kv/test/)
+RES=$($CMD --method get --format binary --path /kv/test)
 test_assert "$EXPECTED" "$RES" "Test KV GET BINARY "
 
 
