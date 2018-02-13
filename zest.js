@@ -42,10 +42,10 @@ exports.New = function (endpoint, dealerEndpoint, serverKey, logging) {
                 zh.options.push(NewZestOptionHeader(3,hostname,hostname.length));
                 zh.options.push(NewZestOptionHeader(12,contentFormatToInt(contentFormat),2)); //uint32
 
-                msg = MarshalZestHeader(zh)
+                let msg = MarshalZestHeader(zh)
                 sendRequestAndAwaitResponse(this.ZMQsoc,msg)
-                .then((msg)=>{
-                    handleResponse(msg,resolve,reject);
+                .then((resp)=>{
+                    handleResponse(resp,resolve,reject);
                 })
                 .catch((err)=>{
                     reject(err);
@@ -65,10 +65,10 @@ exports.New = function (endpoint, dealerEndpoint, serverKey, logging) {
                 zh.options.push(NewZestOptionHeader(3,hostname,hostname.length));
                 zh.options.push(NewZestOptionHeader(12,contentFormatToInt(contentFormat),2)); //uint32
 
-                msg = MarshalZestHeader(zh)
+                let msg = MarshalZestHeader(zh)
                 sendRequestAndAwaitResponse(this.ZMQsoc,msg)
-                .then((msg)=>{
-                    handleResponse(msg,(zh)=>{resolve(zh.payload)},reject);
+                .then((resp)=>{
+                    handleResponse(resp,(zh)=>{resolve(zh.payload)},reject);
                 })
                 .catch((err)=>{
                     reject(err);
@@ -90,9 +90,9 @@ exports.New = function (endpoint, dealerEndpoint, serverKey, logging) {
                 zh.options.push(NewZestOptionHeader(12,contentFormatToInt(contentFormat),2)); //uint32
                 zh.options.push(NewZestOptionHeader(14,timeOut,4)); //uint64
                 log(zh);
-                msg = MarshalZestHeader(zh)
+                let msg = MarshalZestHeader(zh)
                 sendRequestAndAwaitResponse(this.ZMQsoc,msg)
-                .then(function (msg) {
+                .then(function (resp) {
 
                     let observe = function (zh) {
 
@@ -140,7 +140,7 @@ exports.New = function (endpoint, dealerEndpoint, serverKey, logging) {
                         resolve(EE);
                     };
 
-                    handleResponse(msg,observe,reject);
+                    handleResponse(resp,observe,reject);
 
                 })
                 .catch((err)=>{
