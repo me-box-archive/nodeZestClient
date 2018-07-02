@@ -45,7 +45,7 @@ exports.New = function (endpoint, dealerEndpoint, serverKey, logging) {
                 let msg = MarshalZestHeader(zh)
                 sendRequestAndAwaitResponse(this.ZMQsoc,msg)
                 .then((resp)=>{
-                    handleResponse(resp,resolve,reject);
+                    handleResponse(resp,(zh)=>{resolve(zh.payload)},reject);
                 })
                 .catch((err)=>{
                     reject(err);
@@ -330,7 +330,7 @@ function handleResponse(msg, resolve, reject) {
         switch (zr.code) {
         case 65:
             //created
-            resolve("created");
+            resolve(zr);
             return;
         case 69:
             //content
