@@ -3,15 +3,11 @@ const hex = require('hexer');
 const os = require('os');
 const EventEmitter = require('events');
 
-let enableLogging = false;
-
-let dealer_endpoint = "";
-
 exports.New = function (endpoint, dealerEndpoint, serverKey, logging) {
 
-    enableLogging = logging;
+    let enableLogging = logging;
 
-    dealer_endpoint = dealerEndpoint;
+    let dealer_endpoint = dealerEndpoint;
 
     let soc = zmq.socket('req');
 
@@ -155,198 +151,197 @@ exports.New = function (endpoint, dealerEndpoint, serverKey, logging) {
         }
     };
 
-    return zestClient;
-}
 
-function log(msg) {
-    if (enableLogging) {
-		console.log("[Node ZestClient ] ", msg);
-	}
-}
+    function log(msg) {
+        if (enableLogging) {
+            console.log("[Node ZestClient ] ", msg);
+        }
+    }
 
-function sendRequest(ZMQsoc,msg) {
+    function sendRequest(ZMQsoc,msg) {
 
-    log("Sending request:");
-    log("\n" + hex(msg));
-
-    ZMQsoc.send(msg);
-
-}
-
-function sendRequestAndAwaitResponse(ZMQsoc,msg) {
-    return new Promise((resolve,reject)=>{
         log("Sending request:");
         log("\n" + hex(msg));
 
         ZMQsoc.send(msg);
 
-        ZMQsoc.on('message', function(msg){
-            resolve(msg);
-        });
-
-        ZMQsoc.on('error', function(msg){
-            reject(msg);
-        });
-    });
-}
-
-function checkContentFormatFormat(format) {
-
-    switch (format.toUpperCase()) {
-    case "TEXT":
-        return true;
-        break;
-    case "BINARY":
-        return true;
-        break;
-    case "JSON":
-        return true;
-        break;
     }
 
-    return false;
-}
+    function sendRequestAndAwaitResponse(ZMQsoc,msg) {
+        return new Promise((resolve,reject)=>{
+            log("Sending request:");
+            log("\n" + hex(msg));
 
-function contentFormatToInt(format) {
+            ZMQsoc.send(msg);
 
-    switch (format.toUpperCase()) {
-    case "TEXT":
+            ZMQsoc.on('message', function(msg){
+                resolve(msg);
+            });
+
+            ZMQsoc.on('error', function(msg){
+                reject(msg);
+            });
+        });
+    }
+
+    function checkContentFormatFormat(format) {
+
+        switch (format.toUpperCase()) {
+        case "TEXT":
+            return true;
+            break;
+        case "BINARY":
+            return true;
+            break;
+        case "JSON":
+            return true;
+            break;
+        }
+
+        return false;
+    }
+
+    function contentFormatToInt(format) {
+
+        switch (format.toUpperCase()) {
+        case "TEXT":
+            return 0;
+            break;
+        case "BINARY":
+            return 42;
+            break;
+        case "JSON":
+            return 50;
+            break;
+        }
+
         return 0;
-        break;
-    case "BINARY":
-        return 42;
-        break;
-    case "JSON":
-        return 50;
-        break;
     }
 
-    return 0;
-}
+    let NewZestOptionHeader = function (number,value,len) {
+        return {
+            number: number,
+            len: len,
+            value: value,
+          };
+    };
 
-let NewZestOptionHeader = function (number,value,len) {
-    return {
-        number: number,
-        len: len,
-        value: value,
-      };
-};
-
-let NewZestHeader = function () {
-    return {
-        oc: 0,
-        code: 0,
-        tkl: 0,
-        token: "",
-        options: [],
-        payload: "",
-      };
-};
+    let NewZestHeader = function () {
+        return {
+            oc: 0,
+            code: 0,
+            tkl: 0,
+            token: "",
+            options: [],
+            payload: "",
+          };
+    };
 
 
 
-function MarshalZestHeader(zh) {
-    log(zh);
+    function MarshalZestHeader(zh) {
+        log(zh);
 
-    let optionsLen = zh.options.reduce((len,option)=>{return {len:4 + len.len + option.len};});
+        let optionsLen = zh.options.reduce((len,option)=>{return {len:4 + len.len + option.len};});
 
-    let buf = Buffer.alloc(8+zh.tkl+optionsLen.len+Buffer.byteLength(zh.payload,'utf8'));
+        let buf = Buffer.alloc(8+zh.tkl+optionsLen.len+Buffer.byteLength(zh.payload,'utf8'));
 
-    buf.writeUInt8(zh.code,0);
-    buf.writeUInt8(zh.oc,1);
-    buf.writeUInt16BE(zh.tkl,2);
-    buf.write(zh.token,4);
+        buf.writeUInt8(zh.code,0);
+        buf.writeUInt8(zh.oc,1);
+        buf.writeUInt16BE(zh.tkl,2);
+        buf.write(zh.token,4);
 
-    let offset = 4 + zh.tkl;
-    for(let i = 0; i < zh.oc; i++) {
-        zoh = MarshalZestOptionsHeader(zh.options[i]);
-        zoh.copy(buf,offset);
-        offset += zoh.length;
+        let offset = 4 + zh.tkl;
+        for(let i = 0; i < zh.oc; i++) {
+            zoh = MarshalZestOptionsHeader(zh.options[i]);
+            zoh.copy(buf,offset);
+            offset += zoh.length;
+        }
+
+        buf.write(zh.payload,offset,Buffer.byteLength(zh.payload,'utf8'),'utf8');
+
+        return buf;
+
     }
 
-    buf.write(zh.payload,offset,Buffer.byteLength(zh.payload,'utf8'),'utf8');
+    function ParseZestHeader(msgBuf) {
+        let zh = NewZestHeader();
+        zh.code = msgBuf.readUInt8(0);
+        zh.oc = msgBuf.readUInt8(1);
+        zh.tkl = msgBuf.readUInt16BE(2);
+        if (zh.tkl > 0) {
+            zh.token = msgBuf.toString('utf8',4,4+zh.tkl);
+        }
 
-    return buf;
+        offset = 4 + zh.tkl
+        for (let i = 0; i < zh.oc; i++) {
+            zoh = ParseZestOptionsHeader(msgBuf,offset);
+            zh.options.push(zoh);
+            offset += 4+zoh.len;
+        }
+        if(msgBuf.length > offset) {
+            zh.payload = msgBuf.toString('utf8',offset);
+        }
 
-}
-
-function ParseZestHeader(msgBuf) {
-    let zh = NewZestHeader();
-    zh.code = msgBuf.readUInt8(0);
-    zh.oc = msgBuf.readUInt8(1);
-    zh.tkl = msgBuf.readUInt16BE(2);
-    if (zh.tkl > 0) {
-        zh.token = msgBuf.toString('utf8',4,4+zh.tkl);
+        return zh;
     }
 
-    offset = 4 + zh.tkl
-    for (let i = 0; i < zh.oc; i++) {
-        zoh = ParseZestOptionsHeader(msgBuf,offset);
-        zh.options.push(zoh);
-        offset += 4+zoh.len;
+    function MarshalZestOptionsHeader(zoh) {
+
+        log(zoh);
+
+        let buf = Buffer.alloc(4+zoh.len);
+        buf.writeUInt16BE(zoh.number,0);
+        buf.writeUInt16BE(zoh.len,2);
+        if(zoh.number == 12) {
+            buf.writeUInt16BE(zoh.value,4);
+        } else if (zoh.number == 14) {
+            buf.writeUInt32BE(zoh.value,4);
+        } else {
+            buf.write(zoh.value.toString(),4);
+        }
+        return buf;
+
     }
-    if(msgBuf.length > offset) {
-        zh.payload = msgBuf.toString('utf8',offset);
+
+    function ParseZestOptionsHeader(msgBuf,offset) {
+        zoh = NewZestOptionHeader();
+        zoh.number = msgBuf.readUInt16BE(offset);
+        zoh.len = msgBuf.readUInt16BE(offset+2);
+        zoh.value = msgBuf.toString('hex',offset+4,offset+4+zoh.len);
+        return zoh;
     }
 
-    return zh;
-}
+    function handleResponse(msg, resolve, reject) {
 
+            log("Got response:");
+            log("\n" + hex(msg));
 
+            zr = ParseZestHeader(msg);
 
-function MarshalZestOptionsHeader(zoh) {
+            switch (zr.code) {
+            case 65:
+                //created
+                resolve(zr);
+                return;
+            case 69:
+                //content
+                resolve(zr);
+                return;
+            case 128:
+                reject("bad request");
+                return;
+            case 129:
+                reject("unauthorized");
+                return;
+            case 143:
+                reject("unsupported content format");
+                return;
+            }
 
-    log(zoh);
-
-    let buf = Buffer.alloc(4+zoh.len);
-    buf.writeUInt16BE(zoh.number,0);
-    buf.writeUInt16BE(zoh.len,2);
-    if(zoh.number == 12) {
-        buf.writeUInt16BE(zoh.value,4);
-    } else if (zoh.number == 14) {
-        buf.writeUInt32BE(zoh.value,4);
-    } else {
-        buf.write(zoh.value.toString(),4);
-    }
-    return buf;
-
-}
-
-function ParseZestOptionsHeader(msgBuf,offset) {
-    zoh = NewZestOptionHeader();
-    zoh.number = msgBuf.readUInt16BE(offset);
-    zoh.len = msgBuf.readUInt16BE(offset+2);
-    zoh.value = msgBuf.toString('hex',offset+4,offset+4+zoh.len);
-    return zoh;
-}
-
-function handleResponse(msg, resolve, reject) {
-
-        log("Got response:");
-        log("\n" + hex(msg));
-
-        zr = ParseZestHeader(msg);
-
-        switch (zr.code) {
-        case 65:
-            //created
-            resolve(zr);
-            return;
-        case 69:
-            //content
-            resolve(zr);
-            return;
-        case 128:
-            reject("bad request");
-            return;
-        case 129:
-            reject("unauthorized");
-            return;
-        case 143:
-            reject("unsupported content format");
+            reject("invalid code:" + zr.Code);
             return;
         }
 
-        reject("invalid code:" + zr.Code);
-        return;
-    }
+    return zestClient;
+}
