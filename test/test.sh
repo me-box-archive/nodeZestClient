@@ -30,7 +30,6 @@ EXPECTED='{"name":"tosh","age":36}'
 RES=$($CMD --method get --format binary --path /kv/test/data)
 test_assert "$EXPECTED" "$RES" "Test KV GET BINARY "
 
-
 EXPECTED=""
 RES=$($CMD --method post --format json --path /ts/blob/test --payload "{\"name\":\"tosh\",\"age\":38}")
 test_assert "$EXPECTED" "$RES" "Test TS POST JSON "

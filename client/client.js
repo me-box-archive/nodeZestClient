@@ -51,6 +51,41 @@ const argv = yargs
 client = zest.New(argv["request-endpoint"], argv["router-endpoint"],argv["server-key"],argv["enable-logging"]);
 
 switch(argv["method"].toUpperCase()) {
+  case "TEST":
+    client.Post(argv["token"],argv["path"],argv["payload"],argv["format"])
+    .then((resp)=>{
+      console.log("resp: ", resp);
+    })
+    .catch((err)=>{
+      console.log("ERROR: ", err);
+      client.ZMQsoc.close();
+  });
+    client.Post(argv["token"],argv["path"],argv["payload"],argv["format"])
+    .then((resp)=>{
+      console.log("resp: ", resp);
+    })
+    .catch((err)=>{
+      console.log("ERROR: ", err);
+      client.ZMQsoc.close();
+  });
+    client.Post(argv["token"],argv["path"],argv["payload"],argv["format"])
+    .then((resp)=>{
+      console.log("resp: ", resp);
+    })
+    .catch((err)=>{
+        console.log("ERROR: ", err);
+        client.ZMQsoc.close();
+    });
+    client.Get(argv["token"],argv["path"],argv["format"])
+    .then((resp)=>{
+      console.log("GET resp: ", resp);
+      client.ZMQsoc.close();
+    })
+    .catch((err)=>{
+        console.log(err);
+        client.ZMQsoc.close();
+    });
+  break;
   case 'POST':
     client.Post(argv["token"],argv["path"],argv["payload"],argv["format"])
     .then((resp)=>{
